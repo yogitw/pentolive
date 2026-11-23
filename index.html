@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Interaktif Si Pento - 2-Tak Fund</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #1f2937 0%, #0f172a 100%);
+      color: #f9fafb;
+      overflow: hidden;
+    }
+    #stage-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 20px;
+    }
+    .header-badge {
+      background: rgba(239, 68, 68, 0.95);
+      padding: 12px 16px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 18px;
+      text-align: center;
+      letter-spacing: 0.6px;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+    }
+    .progress-box {
+      background: rgba(17, 24, 39, 0.9);
+      border: 2px solid #f59e0b;
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-top: 12px;
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+    .progress-box.pulse {
+      transform: scale(1.04);
+      border-color: #34d399;
+    }
+    .progress-box span { color: #fbbf24; font-weight: 800; font-size: 19px; }
+    .progress-box small { font-size: 14px; color: #e5e7eb; }
+    #avatar-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    #pento-img {
+      max-width: 90%;
+      max-height: 62vh;
+      object-fit: contain;
+      transition: transform 0.08s ease;
+    }
+    .talking { transform: scale(1.03) translateY(-4px); }
+    #chat-bubble {
+      background: rgba(255, 255, 255, 0.96);
+      color: #111827;
+      padding: 16px 18px;
+      border-radius: 18px;
+      font-size: 17px;
+      font-weight: 600;
+      min-height: 96px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+      border: 3px solid transparent;
+    }
+    #chat-bubble.gift-mode {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border-color: #f59e0b;
+    }
+    #chat-user { color: #dc2626; font-weight: 800; margin-bottom: 6px; font-size: 15px; }
+    #chat-bubble.gift-mode #chat-user { color: #b45309; }
+    #mini-status {
+      position: fixed;
+      bottom: 4px;
+      right: 8px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.35);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="stage-wrapper">
+    <div>
+      <div class="header-badge">🔴 LIVE MISI 2-TAK PENTO</div>
+      <div class="progress-box" id="progress-box">
+        🎯 Target Lapak: <span id="follower-display">500 / 600 Followers</span><br/>
+        <small>Bantu Follow & Kasih Saran Motor 2-Tak Suhu! 👇</small>
+      </div>
+    </div>
+
+    <div id="avatar-container">
+      <img id="pento-img" src="pento_diam.png" alt="Pento" />
+    </div>
+
+    <div id="chat-bubble">
+      <div id="chat-user">Menunggu komentar suhu 2-tak...</div>
+      <div id="chat-text">Halo pasukan! Mending ambil bebek 2-tak dulu atau langsung nabung Ninja SS nih?</div>
+    </div>
+  </div>
+
+  <div id="mini-status">AI: Init | TF: Init</div>
+
+  <script>
+    const SYSTEM_PROMPT = `Kamu adalah Pento, karakter kartun berkepala bulat putih memakai hoodie hitam dari akun TikTok @ceritapento. Kamu sedang TikTok Live ngobrol santai bersama pecinta motor 2-tak Indonesia.
+Misi Pento: Menabung dari nol di toples kaca ("2-TAK FUND") untuk beli motor 2-tak. Dilema terbaru: Pento habis cek harga bahan Yamaha F1ZR (5 jutaan), Alfa (2 jutaan), Tornado GS (2,8 jutaan), dan RC 100. Tapi hati kecil Pento sebenarnya ingin Kawasaki Ninja 150 SS lampu bulat (harga bahan/convert 25 jutaan, mulus/kuning orisinal 50-70 jutaan). Pento sedang minta saran penonton: mending pakai strategi batu loncatan (beli bebek 2-tak dulu) atau puasa jajan langsung nabung panjang demi Ninja SS. Target akun menuju 600 followers untuk buka Keranjang Kuning.
+Aturan Wajib:
+1. Bahasa Indonesia gaul, santai, jenaka, rendah hati seperti teman bengkel. Panggil penonton "Suhu" atau "Bang".
+2. Jika ada komentar biasa: sebut nama penontonnya dan tanggapi singkat (maksimal 2 kalimat pendek) yang nyambung dengan motor 2-tak.
+3. Jika ada penonton yang mengirim GIFT: sebut namanya dan jenis gift-nya dengan super senang dan bersyukur, lalu DOAKAN kebaikan untuk dia (misalnya: semoga rezekinya dilancarkan, sehat selalu, dan motor impiannya segera terwujud).
+4. Jangan membaca simbol atau tanda baca secara harfiah. Jangan mengaku sebagai AI.`;
+
+    const params = new URLSearchParams(window.location.search);
+    const API_KEY = params.get('key') || '';
+    let currentFollowers = parseInt(params.get('f') || '500', 10);
+    const targetFollowers = 600;
+    const countedFollowers = new Set();
+
+    let ws = null;
+    let audioCtx = null;
+    let nextPlayTime = 0;
+    let isBusy = false;
+    const commentQueue = [];
+    let talkTimer = null;
+    let aiState = 'Off';
+    let tfState = 'Off';
+
+    function updateStatus() {
+      document.getElementById('mini-status').innerText = `AI: ${aiState} | TF: ${tfState}`;
+    }
+
+    function updateFollowerUI() {
+      document.getElementById('follower-display').innerText = `${currentFollowers} / ${targetFollowers} Followers`;
+      const box = document.getElementById('progress-box');
+      box.classList.add('pulse');
+      setTimeout(() => box.classList.remove('pulse'), 500);
+    }
+
+    function setTalking(active) {
+      const img = document.getElementById('pento-img');
+      if (active) {
+        img.src = 'pento_ngomong.png';
+        img.classList.add('talking');
+        clearTimeout(talkTimer);
+        talkTimer = setTimeout(() => setTalking(false), 350);
+      } else {
+        img.src = 'pento_diam.png';
+        img.classList.remove('talking');
+      }
+    }
+
+    function connectLive() {
+      if (!API_KEY) {
+        aiState = 'NoKey';
+        updateStatus();
+        return;
+      }
+
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+      const url = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${API_KEY}`;
+      ws = new WebSocket(url);
+
+      ws.onopen = () => {
+        ws.send(JSON.stringify({
+          setup: {
+            model: "models/gemini-2.5-flash-native-audio-preview-12-2025",
+            generationConfig: {
+              responseModalities: ["AUDIO"],
+              speechConfig: {
+                voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } }
+              }
+            },
+            systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }
+          }
+        }));
+
+        if (window.keepAliveTimer) clearInterval(window.keepAliveTimer);
+        window.keepAliveTimer = setInterval(() => {
+          if (ws && ws.readyState === WebSocket.OPEN && !isBusy && commentQueue.length === 0) {
+            ws.send(JSON.stringify({ clientContent: { turns: [], turnComplete: false } }));
+          }
+        }, 25000);
+      };
+
+      ws.onmessage = async (event) => {
+        let rawText = event.data;
+        if (event.data instanceof Blob) rawText = await event.data.text();
+        const data = JSON.parse(rawText);
+
+        if (data.setupComplete) {
+          aiState = 'OK';
+          updateStatus();
+        }
+        if (data.serverContent && data.serverContent.modelTurn) {
+          const parts = data.serverContent.modelTurn.parts || [];
+          for (const part of parts) {
+            if (part.inlineData && part.inlineData.data) playPcmAudio(part.inlineData.data);
+          }
+        }
+        if (data.serverContent && data.serverContent.turnComplete) {
+          setTimeout(() => {
+            isBusy = false;
+            processQueue();
+          }, 1200);
+        }
+      };
+
+      ws.onclose = () => {
+        aiState = 'Retry...';
+        updateStatus();
+        setTimeout(connectLive, 3000);
+      };
+    }
+
+    function playPcmAudio(base64Data) {
+      if (!audioCtx) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const binary = atob(base64Data);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const int16 = new Int16Array(bytes.buffer);
+      const float32 = new Float32Array(int16.length);
+      for (let i = 0; i < int16.length; i++) float32[i] = int16[i] / 32768.0;
+
+      const buffer = audioCtx.createBuffer(1, float32.length, 24000);
+      buffer.getChannelData(0).set(float32);
+
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+      if (nextPlayTime < now) nextPlayTime = now;
+      source.start(nextPlayTime);
+      nextPlayTime += buffer.duration;
+
+      setTalking(true);
+    }
+
+    function enqueueComment(user, text) {
+      if (commentQueue.length >= 6) commentQueue.shift();
+      commentQueue.push({ type: 'chat', user, text });
+      processQueue();
+    }
+
+    function enqueueGift(user, giftName, count) {
+      const jumlah = count && count > 1 ? `${count}x ` : '';
+      commentQueue.unshift({
+        type: 'gift',
+        user,
+        text: `Mengirim ${jumlah}Gift ${giftName}! 🎁`,
+        giftDetail: `${jumlah}${giftName}`
+      });
+      processQueue();
+    }
+
+    function processQueue() {
+      if (isBusy || commentQueue.length === 0 || !ws || ws.readyState !== WebSocket.OPEN) return;
+      isBusy = true;
+      const item = commentQueue.shift();
+      const bubble = document.getElementById('chat-bubble');
+
+      if (item.type === 'gift') {
+        bubble.classList.add('gift-mode');
+        document.getElementById('chat-user').innerText = `🎁 SULTAN ${item.user.toUpperCase()}:`;
+        document.getElementById('chat-text').innerText = item.text;
+        ws.send(JSON.stringify({
+          clientContent: {
+            turns: [{ role: "user", parts: [{ text: `Penonton bernama ${item.user} baru saja mengirim Gift ${item.giftDetail}! Bacakan nama dan gift-nya dengan penuh rasa syukur dan semangat, lalu doakan kebaikan dan kelancaran rezeki untuk ${item.user} sekarang!` }] }],
+            turnComplete: true
+          }
+        }));
+      } else {
+        bubble.classList.remove('gift-mode');
+        document.getElementById('chat-user').innerText = `💬 ${item.user}:`;
+        document.getElementById('chat-text').innerText = item.text;
+        ws.send(JSON.stringify({
+          clientContent: {
+            turns: [{ role: "user", parts: [{ text: `Penonton bernama ${item.user} berkomentar: "${item.text}". Balas langsung sekarang!` }] }],
+            turnComplete: true
+          }
+        }));
+      }
+    }
+
+    function connectTikFinity() {
+      const tfWs = new WebSocket("ws://localhost:21213/");
+      tfWs.onopen = () => {
+        tfState = 'OK';
+        updateStatus();
+      };
+      tfWs.onmessage = (evt) => {
+        try {
+          const payload = JSON.parse(evt.data);
+          const d = payload.data || {};
+          const nama = d.nickname || d.uniqueId || 'Suhu';
+
+          if (payload.event === 'chat' && d.comment) {
+            enqueueComment(nama, d.comment);
+          } else if (payload.event === 'gift') {
+            if (d.giftType === 1 && !d.repeatEnd) return;
+            enqueueGift(nama, d.giftName || 'Gift', d.repeatCount || 1);
+          } else if (payload.event === 'follow') {
+            const uid = d.uniqueId || nama;
+            if (!countedFollowers.has(uid)) {
+              countedFollowers.add(uid);
+              currentFollowers += 1;
+              updateFollowerUI();
+            }
+          }
+        } catch (e) {}
+      };
+      tfWs.onclose = () => {
+        tfState = 'Retry...';
+        updateStatus();
+        setTimeout(connectTikFinity, 3000);
+      };
+    }
+
+    window.onload = () => {
+      updateFollowerUI();
+      connectLive();
+      connectTikFinity();
+    };
+  </script>
+</body>
+</html>
