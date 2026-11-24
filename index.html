@@ -38,7 +38,6 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
     }
 
-    /* Header Live Badge */
     .live-banner {
       background: linear-gradient(90deg, #dc2626, #ef4444);
       color: #fff;
@@ -68,7 +67,6 @@
       50% { opacity: 0.4; transform: scale(0.8); }
     }
 
-    /* Target Followers Box */
     .target-box {
       background: rgba(15, 23, 42, 0.9);
       border: 2px solid #f59e0b;
@@ -118,7 +116,6 @@
       transition: width 0.4s ease;
     }
 
-    /* Character Frame */
     .character-wrap {
       flex: 1;
       display: flex;
@@ -157,7 +154,6 @@
       to { transform: translateY(-5px) scale(1.025); }
     }
 
-    /* Dialog Box: Merah = Komen Penonton, Hitam = Jawaban Pento */
     .dialog-box {
       background: #ffffff;
       color: #0f172a;
@@ -187,7 +183,6 @@
       color: #0f172a;
     }
 
-    /* Status Footer */
     .status-bar {
       display: flex;
       justify-content: flex-end;
@@ -253,19 +248,12 @@
 
   <script>
     // ==========================================
-    // 1. KONFIGURASI API KEY & FOLLOWERS
+    // 1. KONFIGURASI FOLLOWERS
     // ==========================================
     const urlParams = new URLSearchParams(window.location.search);
     const DEFAULT_FOLLOWERS = 557;
     const GOAL_FOLLOWERS = 600;
 
-    const K1 = 'AQ.Ab8RN6JJ41q_5mJKc2Vet_gE';
-    const K2 = 'O1HxJC1Zbx-Gmz2ykMsaTMhNyw';
-    const API_KEY = urlParams.get('key') || (K1 + K2);
-
-    // ==========================================
-    // 2. MANAJEMEN COUNTER FOLLOWERS
-    // ==========================================
     let currentFollowers = parseInt(urlParams.get('f')) ||
                            parseInt(localStorage.getItem('pento_followers')) ||
                            DEFAULT_FOLLOWERS;
@@ -294,7 +282,7 @@
     renderFollowers();
 
     // ==========================================
-    // 3. ANIMASI KARAKTER & SUARA KARTUN PENTO (PUCK)
+    // 2. ANIMASI KARAKTER & SUARA KARTUN PENTO
     // ==========================================
     const pentoImg = document.getElementById('pentoImg');
     const dialogSender = document.getElementById('dialogSender');
@@ -371,122 +359,42 @@
     }
 
     // ==========================================
-    // 4. OTAK BALASAN BERVARIASI (ANTI MONOTON)
+    // 3. AI 100% GRATIS TANPA API KEY (POLLINATIONS AI)
     // ==========================================
-    let lastReplyIndex = -1;
-
-    function pickUnique(list) {
-      if (list.length === 1) return list[0];
-      let idx;
-      do {
-        idx = Math.floor(Math.random() * list.length);
-      } while (idx === lastReplyIndex);
-      lastReplyIndex = idx;
-      return list[idx];
-    }
-
-    function dynamicLocalReply(username, comment) {
-      const c = comment.toLowerCase();
-
-      if (c.includes('rose') || c.includes('sawer') || c.includes('gift') || c.includes('koin')) {
-        return pickUnique([
-          `Waduh makasih banyak sawerannya Bang ${username}! Langsung Pento cemplungin ke toples buat nebus Ninja SS!`,
-          `Sultan ${username} turun tangan! Terima kasih gift-nya suhu, semoga rezekinya lancar jaya!`,
-          `Asik dapet tambahan amunisi dari Bang ${username}! Makin dekat nih impian 2-tak Pento!`
-        ]);
-      }
-
-      if (c.includes('follow') || c.includes('mengikuti')) {
-        return pickUnique([
-          `Mantap Bang ${username} resmi gabung pasukan! Sisa dikit lagi tembus 600 followers nih!`,
-          `Terima kasih sudah follow Bang ${username}! Selamat datang di garasi misi 2-tak Si Pento!`,
-          `Satu langkah lebih dekat ke 600 berkat Bang ${username}! Gas kasih saran motor 2-tak suhu!`
-        ]);
-      }
-
-      if (c.includes('ninja') || c.includes('ss') || c.includes('rr') || c.includes('rgr')) {
-        return pickUnique([
-          `Pilihan berkelas Bang ${username}! Jambakan SuperKIPS Ninja SS emang bikin susah move on!`,
-          `Wah racun berat dari Bang ${username}! Kira-kira harga bahan Ninja SS yang sehat sekarang berapaan ya?`,
-          `Setuju banget Bang ${username}, kalau sabar nabung di toples pasti kebeli juga Ninja SS impian!`
-        ]);
-      }
-
-      if (c.includes('f1zr') || c.includes('fiz') || c.includes('alfa') || c.includes('tornado') || c.includes('bebek') || c.includes('satria')) {
-        return pickUnique([
-          `Bebek 2-tak emang paling sat-set Bang ${username}! Buat harian dapet, buat gaya nostalgia juga dapet!`,
-          `Nah bener kata Bang ${username}, F1ZR atau Tornado harganya masih masuk akal buat pemula 2-tak!`,
-          `Suara garing bebek 2-tak emang candu banget Bang ${username}, apalagi kalau settingan karbunya pas!`
-        ]);
-      }
-
-      if (c.includes('rx') || c.includes('king') || c.includes('jambret')) {
-        return pickUnique([
-          `Waduh sangar banget saran Bang ${username}! RX-King mah raja jalanan, suaranya bikin merinding!`,
-          `Kalau ambil RX-King kata Bang ${username}, toples Pento harus diisi lebih penuh lagi nih!`
-        ]);
-      }
-
-      if (c.includes('halo') || c.includes('hai') || c.includes('assalam') || c.includes('malam') || c.includes('bang') || c.includes('pento')) {
-        return pickUnique([
-          `Halo juga Bang ${username}! Lagi mantau misi toples 2-tak Pento nih, tim Ninja SS atau tim bebek 2-tak?`,
-          `Salken Bang ${username}! Bantu follow menuju 600 ya suhu biar lapak Pento makin rame!`,
-          `Hadir Bang ${username}! Mampir kasih racun motor 2-tak paling rekomen dong suhu!`
-        ]);
-      }
-
-      // Menjawab langsung dengan mengutip/menanggapi isi komentar penonton secara variatif
-      const shortComment = comment.length > 45 ? comment.slice(0, 45) + '...' : comment;
-      return pickUnique([
-        `Soal "${shortComment}" dari Bang ${username}, Pento setuju banget sih! Suhu 2-tak lain gimana pendapatnya?`,
-        `Menarik nih kata Bang ${username} soal "${shortComment}"! Langsung Pento jadiin bahan pertimbangan di garasi!`,
-        `Gokil masukan dari Bang ${username}: "${shortComment}"! Bantu tap-tap layar sama follow menuju 600 ya suhu!`,
-        `Wah bener juga kata Bang ${username} tentang "${shortComment}"! Makin semangat Pento ngisi toples 2-tak!`
-      ]);
-    }
-
     async function generatePentoReply(username, comment) {
-      const prompt = `Kamu adalah "Si Pento", karakter kartun 2D kocak, ceria, dan antusias asal Indonesia yang sedang live TikTok (@ceritapento) untuk misi menabung di toples demi membeli motor 2-tak impian (Kawasaki Ninja 150 SS, Yamaha F1ZR, Alfa, atau Suzuki Tornado) sambil mengejar target 600 followers.
-Penonton bernama "${username}" baru saja berkomentar: "${comment}".
-Balas komentar tersebut secara relevan, nyambung langsung dengan isi komentarnya, santai ala anak motor 2-tak Indonesia, maksimal 2 kalimat pendek (maksimal 150 karakter) agar enak dibacakan suara AI. Jangan pakai hashtag atau emoji.`;
+      const systemInstruction = `Kamu adalah "Si Pento", karakter kartun 2D kocak dan ramah yang sedang live TikTok (@ceritapento). Misi live: menabung uang di toples untuk membeli motor 2-tak impian (Kawasaki Ninja 150 SS, Yamaha F1ZR, Alfa, atau Suzuki Tornado) dan mengejar target 600 followers. Jawab langsung komentar penonton dengan santai, relevan, nyambung dengan pertanyaan/komentarnya, gaya tongkrongan motor Indonesia, maksimal 2 kalimat singkat (maksimal 140 karakter), tanpa emoji dan tanpa hashtag.`;
+      const userMsg = `Penonton bernama "${username}" berkomentar: "${comment}". Berikan balasan Si Pento yang nyambung langsung:`;
 
-      const endpoints = [
-        {
-          url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': API_KEY }
-        },
-        {
-          url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(API_KEY)}`,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      ];
+      try {
+        const res = await fetch('https://text.pollinations.ai/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [
+              { role: 'system', content: systemInstruction },
+              { role: 'user', content: userMsg }
+            ],
+            model: 'openai',
+            seed: Math.floor(Math.random() * 100000)
+          })
+        });
 
-      for (const ep of endpoints) {
-        try {
-          const res = await fetch(ep.url, {
-            method: 'POST',
-            headers: ep.headers,
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: { temperature: 0.9, maxOutputTokens: 110 }
-            })
-          });
-
-          if (res.ok) {
-            const data = await res.json();
-            const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-            if (reply) {
-              aiStatus.textContent = 'AI: OK';
-              aiStatus.className = 'badge-ok';
-              return reply;
-            }
+        if (res.ok) {
+          let reply = await res.text();
+          reply = reply.replace(/[*#_~`"]/g, '').trim();
+          if (reply && reply.length > 3 && reply.length < 260) {
+            aiStatus.textContent = 'AI: FREE OK';
+            aiStatus.className = 'badge-ok';
+            return reply;
           }
-        } catch (e) {}
+        }
+      } catch (e) {
+        console.warn('Pollinations error:', e);
       }
 
-      aiStatus.textContent = 'AI: SMART';
-      aiStatus.className = 'badge-ok';
-      return dynamicLocalReply(username, comment);
+      aiStatus.textContent = 'AI: BACKUP';
+      aiStatus.className = 'badge-warn';
+      return `Terima kasih komentarnya Bang ${username}! Bantu follow menuju 600 ya suhu biar toples 2-tak Pento makin penuh!`;
     }
 
     async function processQueue() {
@@ -494,12 +402,10 @@ Balas komentar tersebut secara relevan, nyambung langsung dengan isi komentarnya
       isBusy = true;
 
       const item = commentQueue.shift();
-      // Tulisan merah menampilkan nama & isi komentar penonton secara utuh
       dialogSender.textContent = `💬 ${item.user}: "${item.text}"`;
       dialogText.textContent = 'Pento lagi mikir jawaban...';
 
       const reply = await generatePentoReply(item.user, item.text);
-      // Tulisan hitam menampilkan jawaban Pento
       dialogText.textContent = reply;
 
       speakText(reply, () => {
@@ -516,7 +422,7 @@ Balas komentar tersebut secara relevan, nyambung langsung dengan isi komentarnya
     }
 
     // ==========================================
-    // 5. KONEKSI WEBSOCKET TIKFINITY DESKTOP
+    // 4. KONEKSI WEBSOCKET TIKFINITY DESKTOP
     // ==========================================
     function connectTikFinity() {
       let ws;
