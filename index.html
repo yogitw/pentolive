@@ -112,7 +112,7 @@
     .progress-bar {
       height: 100%;
       background: linear-gradient(90deg, #f59e0b, #22c55e);
-      width: 92.8%;
+      width: 97.6%;
       transition: width 0.4s ease;
     }
 
@@ -213,7 +213,7 @@
 
       <div class="target-box" id="targetBox" title="Klik untuk ubah jumlah followers manual">
         <div class="target-title">
-          🎯 Target Lapak: <span id="followerCount">557</span> / <span id="followerGoal">600</span> Followers
+          🎯 Target Lapak: <span id="followerCount">586</span> / <span id="followerGoal">600</span> Followers
         </div>
         <div class="target-sub">Bantu Follow & Kasih Saran Motor 2-Tak Suhu! 👇</div>
         <div class="progress-wrap">
@@ -251,12 +251,12 @@
     // 1. KONFIGURASI FOLLOWERS
     // ==========================================
     const urlParams = new URLSearchParams(window.location.search);
-    const DEFAULT_FOLLOWERS = 557;
+    const DEFAULT_FOLLOWERS = 586;
     const GOAL_FOLLOWERS = 600;
 
+    let savedFollowers = parseInt(localStorage.getItem('pento_followers')) || 0;
     let currentFollowers = parseInt(urlParams.get('f')) ||
-                           parseInt(localStorage.getItem('pento_followers')) ||
-                           DEFAULT_FOLLOWERS;
+                           Math.max(savedFollowers, DEFAULT_FOLLOWERS);
 
     const followerCountEl = document.getElementById('followerCount');
     const followerGoalEl = document.getElementById('followerGoal');
@@ -359,11 +359,16 @@
     }
 
     // ==========================================
-    // 3. AI 100% GRATIS TANPA API KEY (POLLINATIONS AI)
+    // 3. AI 100% GRATIS & FASIH BAHASA INDONESIA
     // ==========================================
     async function generatePentoReply(username, comment) {
-      const systemInstruction = `Kamu adalah "Si Pento", karakter kartun 2D kocak dan ramah yang sedang live TikTok (@ceritapento). Misi live: menabung uang di toples untuk membeli motor 2-tak impian (Kawasaki Ninja 150 SS, Yamaha F1ZR, Alfa, atau Suzuki Tornado) dan mengejar target 600 followers. Jawab langsung komentar penonton dengan santai, relevan, nyambung dengan pertanyaan/komentarnya, gaya tongkrongan motor Indonesia, maksimal 2 kalimat singkat (maksimal 140 karakter), tanpa emoji dan tanpa hashtag.`;
-      const userMsg = `Penonton bernama "${username}" berkomentar: "${comment}". Berikan balasan Si Pento yang nyambung langsung:`;
+      const systemInstruction = `Kamu adalah Si Pento, karakter kartun lucu yang sedang live TikTok (@ceritapento) untuk misi nabung beli motor 2-tak (seperti Kawasaki Ninja 150 SS, Yamaha F1ZR, Alfa, RX-King, atau Suzuki Tornado) dan mengejar 600 followers.
+Aturan wajib:
+1. Gunakan Bahasa Indonesia yang jelas, natural, dan mudah dibaca (DILARANG mengarang kata aneh atau typo).
+2. Jika penonton menyebut motor 4-tak (seperti Jupiter, Supra, Beat, Vario, Mio, Vixion), sanggah dengan kocak bahwa misi Pento khusus motor 2-tak yang ngebul dan wangi oli samping.
+3. Jawab langsung inti komentar penonton secara nyambung, maksimal 2 kalimat pendek (maksimal 130 karakter), tanpa emoji dan tanpa hashtag.`;
+
+      const userMsg = `Penonton "${username}" berkomentar: "${comment}". Balas singkat dan nyambung:`;
 
       try {
         const res = await fetch('https://text.pollinations.ai/', {
@@ -374,7 +379,7 @@
               { role: 'system', content: systemInstruction },
               { role: 'user', content: userMsg }
             ],
-            model: 'openai',
+            model: 'openai-large',
             seed: Math.floor(Math.random() * 100000)
           })
         });
@@ -382,7 +387,7 @@
         if (res.ok) {
           let reply = await res.text();
           reply = reply.replace(/[*#_~`"]/g, '').trim();
-          if (reply && reply.length > 3 && reply.length < 260) {
+          if (reply && reply.length > 3 && reply.length < 240) {
             aiStatus.textContent = 'AI: FREE OK';
             aiStatus.className = 'badge-ok';
             return reply;
@@ -394,7 +399,7 @@
 
       aiStatus.textContent = 'AI: BACKUP';
       aiStatus.className = 'badge-warn';
-      return `Terima kasih komentarnya Bang ${username}! Bantu follow menuju 600 ya suhu biar toples 2-tak Pento makin penuh!`;
+      return `Siap Bang ${username}, masukanmu langsung Pento catat! Bantu follow menuju 600 ya suhu biar toples 2-tak cepat penuh!`;
     }
 
     async function processQueue() {
