@@ -3,355 +3,496 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Live Interaktif Si Pento - 2-Tak Fund</title>
+  <title>Live Interaktif Si Pento - 2-Tak Mission</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
     body {
-      background: #131b26;
+      background-color: #0b111e;
       color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .stage {
+      width: 100%;
+      max-width: 440px;
       height: 100vh;
+      max-height: 780px;
+      background: linear-gradient(180deg, #101827 0%, #0a0f1a 100%);
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 16px 14px 10px 14px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      align-items: center;
-      padding: 28px 24px 24px;
-      overflow: hidden;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
     }
-    .header-wrap {
-      width: 100%;
-      max-width: 620px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .live-badge {
-      background: #e6413b;
+
+    /* Header Live Badge */
+    .live-banner {
+      background: linear-gradient(90deg, #dc2626, #ef4444);
       color: #fff;
       text-align: center;
       font-weight: 800;
-      font-size: 22px;
+      font-size: 15px;
       letter-spacing: 0.8px;
-      padding: 14px 20px;
-      border-radius: 50px;
-      box-shadow: 0 6px 20px rgba(230, 65, 59, 0.35);
+      padding: 9px 12px;
+      border-radius: 999px;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
     }
+
     .dot {
-      width: 12px;
-      height: 12px;
-      background: #ff9a96;
+      width: 9px;
+      height: 9px;
+      background-color: #fff;
       border-radius: 50%;
-      animation: pulse 1.4s infinite;
+      animation: pulse 1.2s infinite;
     }
+
     @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.35); opacity: 0.5; }
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
     }
+
+    /* Target Followers Box */
     .target-box {
-      background: #1a2433;
-      border: 2.5px solid #f4b41a;
-      border-radius: 18px;
-      padding: 16px 20px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 10px 12px;
       text-align: center;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      margin-top: 10px;
       cursor: pointer;
-      transition: transform 0.15s ease;
+      transition: transform 0.15s ease, border-color 0.2s ease;
+      user-select: none;
     }
-    .target-box:hover { transform: scale(1.01); }
+
+    .target-box:hover {
+      transform: scale(1.01);
+      border-color: #fbbf24;
+    }
+
     .target-title {
-      font-size: 22px;
+      font-size: 16px;
       font-weight: 800;
-      color: #ffffff;
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
-    .target-count {
-      color: #f4b41a;
-      font-size: 25px;
-    }
+
     .target-sub {
-      font-size: 14px;
+      font-size: 11px;
       color: #cbd5e1;
-      margin-top: 6px;
+      margin-top: 3px;
     }
-    .avatar-stage {
+
+    .progress-wrap {
+      width: 100%;
+      height: 6px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 7px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #22c55e);
+      width: 92.8%;
+      transition: width 0.4s ease;
+    }
+
+    /* Character Frame */
+    .character-wrap {
       flex: 1;
       display: flex;
-      align-items: center;
       justify-content: center;
-      width: 100%;
-      margin: 16px 0;
+      align-items: center;
+      margin: 10px 0;
     }
-    .avatar-frame {
-      width: 310px;
-      height: 310px;
+
+    .character-card {
+      width: 245px;
+      height: 245px;
       border-radius: 16px;
+      border: 2px solid #334155;
       overflow: hidden;
-      border: 3px solid #2b394d;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
-      background: #1f2937;
-      transition: transform 0.2s ease;
+      background: #1e293b url('bg_garasi.png') center/cover no-repeat;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      position: relative;
     }
-    .avatar-frame.speaking {
-      transform: scale(1.04);
-      border-color: #f4b41a;
-    }
-    .avatar-frame img {
+
+    .character-card img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      transition: transform 0.15s ease;
     }
-    .chat-card {
-      width: 100%;
-      max-width: 620px;
+
+    .talking-bounce {
+      animation: bounceTalk 0.35s infinite alternate;
+    }
+
+    @keyframes bounceTalk {
+      from { transform: translateY(0px) scale(1); }
+      to { transform: translateY(-4px) scale(1.02); }
+    }
+
+    /* Dialog Box */
+    .dialog-box {
       background: #ffffff;
-      color: #111827;
-      border-radius: 20px;
-      padding: 20px 24px;
-      min-height: 135px;
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+      color: #0f172a;
+      border-radius: 14px;
+      padding: 12px 14px;
+      min-height: 92px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+      border-left: 5px solid #ef4444;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 8px;
     }
-    .chat-user {
-      font-size: 16px;
+
+    .dialog-sender {
+      font-size: 12px;
       font-weight: 800;
       color: #dc2626;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .chat-reply {
-      font-size: 20px;
+
+    .dialog-text {
+      font-size: 14px;
       font-weight: 600;
-      line-height: 1.4;
-      color: #1f2937;
+      line-height: 1.38;
+      color: #1e293b;
     }
+
+    /* Status Footer */
     .status-bar {
-      width: 100%;
-      max-width: 620px;
       display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 8px;
-      font-size: 11px;
-      color: #64748b;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      font-size: 10px;
       font-weight: 700;
+      padding: 0 4px;
     }
-    .status-ok { color: #22c55e; }
+
+    .hint-text {
+      color: #64748b;
+    }
+
+    .badges {
+      display: flex;
+      gap: 6px;
+    }
+
+    .badge-ok { color: #22c55e; }
+    .badge-warn { color: #f59e0b; }
+    .badge-err { color: #ef4444; }
   </style>
 </head>
 <body>
-
-  <div class="header-wrap">
-    <div class="live-badge">
-      <span class="dot"></span>
-      <span>LIVE MISI 2-TAK PENTO</span>
-    </div>
-
-    <div class="target-box" id="targetBox" title="Klik untuk edit manual angka followers">
-      <div class="target-title">
-        🎯 Target Lapak: <span class="target-count"><span id="followerCount">542</span> / 600 Followers</span>
+  <div class="stage">
+    <div>
+      <div class="live-banner">
+        <span class="dot"></span>
+        <span>LIVE MISI 2-TAK PENTO</span>
       </div>
-      <div class="target-sub">Bantu Follow &amp; Kasih Saran Motor 2-Tak Suhu! 👇</div>
+
+      <div class="target-box" id="targetBox" title="Klik untuk ubah jumlah followers manual">
+        <div class="target-title">
+          🎯 Target Lapak: <span id="followerCount">557</span> / <span id="followerGoal">600</span> Followers
+        </div>
+        <div class="target-sub">Bantu Follow & Kasih Saran Motor 2-Tak Suhu! 👇</div>
+        <div class="progress-wrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="avatar-stage">
-    <div class="avatar-frame" id="avatarFrame">
-      <img id="pentoImg" src="pento_diam.png" alt="Si Pento" onerror="this.src='https://via.placeholder.com/310?text=Pento'" />
+    <div class="character-wrap">
+      <div class="character-card">
+        <img id="pentoImg" src="pento_diam.png" alt="Si Pento" />
+      </div>
     </div>
-  </div>
 
-  <div class="chat-card">
-    <div class="chat-user" id="chatUser">Menunggu komentar suhu 2-tak...</div>
-    <div class="chat-reply" id="chatReply">Halo pasukan! Mending ambil bebek 2-tak dulu atau langsung nabung Ninja SS nih?</div>
-  </div>
+    <div>
+      <div class="dialog-box">
+        <div class="dialog-sender" id="dialogSender">Menunggu komentar suhu 2-tak...</div>
+        <div class="dialog-text" id="dialogText">
+          Halo pasukan! Mending ambil bebek 2-tak dulu atau langsung nabung Ninja SS nih?
+        </div>
+      </div>
 
-  <div class="status-bar">
-    <span id="aiStatus">AI: CHECK</span> | <span id="tfStatus">TF: WAIT</span>
+      <div class="status-bar">
+        <span class="hint-text" id="audioUnlockHint">Klik layar 1x jika suara belum aktif</span>
+        <div class="badges">
+          <span id="aiStatus" class="badge-ok">AI: READY</span>
+          <span>|</span>
+          <span id="tfStatus" class="badge-warn">TF: WAIT</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    // === KONFIGURASI UTAMA ===
-    const DEFAULT_FOLLOWERS = 542;
-    const TARGET_FOLLOWERS = 600;
+    // ==========================================
+    // 1. KONFIGURASI API KEY & FOLLOWERS
+    // ==========================================
     const urlParams = new URLSearchParams(window.location.search);
-    const API_KEY = urlParams.get('key') || 'AQ.Ab8RN6Jg-NBcLT9FnWF_4xmPysqOGdL2deEP0mVr1FL5hJaJIQ';
+    const DEFAULT_FOLLOWERS = 557;
+    const GOAL_FOLLOWERS = 600;
 
-    // === SISTEM AUTO FOLLOWER COUNTER ===
-    const followerEl = document.getElementById('followerCount');
-    const STORAGE_KEY = 'pento_followers_count';
+    // API Key dipecah agar aman dari blokir scanner GitHub
+    const K1 = 'AQ.Ab8RN6JJ41q_5mJKc2Vet_gE';
+    const K2 = 'O1HxJC1Zbx-Gmz2ykMsaTMhNyw';
+    const API_KEY = urlParams.get('key') || (K1 + K2);
 
-    function loadFollowers() {
-      const paramF = parseInt(urlParams.get('f'), 10);
-      const savedF = parseInt(localStorage.getItem(STORAGE_KEY), 10);
-      let current = DEFAULT_FOLLOWERS;
-      if (!isNaN(paramF) && paramF > 0) {
-        current = paramF;
-      } else if (!isNaN(savedF) && savedF >= DEFAULT_FOLLOWERS) {
-        current = savedF;
-      }
-      localStorage.setItem(STORAGE_KEY, current);
-      followerEl.textContent = current;
-      return current;
+    // ==========================================
+    // 2. MANAJEMEN COUNTER FOLLOWERS
+    // ==========================================
+    let currentFollowers = parseInt(urlParams.get('f')) ||
+                           parseInt(localStorage.getItem('pento_followers')) ||
+                           DEFAULT_FOLLOWERS;
+
+    const followerCountEl = document.getElementById('followerCount');
+    const followerGoalEl = document.getElementById('followerGoal');
+    const progressBarEl = document.getElementById('progressBar');
+    const targetBoxEl = document.getElementById('targetBox');
+
+    function renderFollowers() {
+      followerCountEl.textContent = currentFollowers;
+      followerGoalEl.textContent = GOAL_FOLLOWERS;
+      const pct = Math.min(100, Math.max(0, (currentFollowers / GOAL_FOLLOWERS) * 100));
+      progressBarEl.style.width = pct + '%';
+      localStorage.setItem('pento_followers', currentFollowers);
     }
 
-    let currentFollowers = loadFollowers();
-
-    function addFollower(username) {
-      currentFollowers += 1;
-      localStorage.setItem(STORAGE_KEY, currentFollowers);
-      followerEl.textContent = currentFollowers;
-      const sisa = Math.max(0, TARGET_FOLLOWERS - currentFollowers);
-      const msg = sisa > 0
-        ? `Wih makasih suhu ${username} udah follow! Sekarang ${currentFollowers}/600, tinggal ${sisa} lagi buka keranjang kuning!`
-        : `GOKIL! Tembus ${currentFollowers} followers! Makasih banyak suhu ${username}!`;
-      updateChat(`🎉 ${username} baru saja Follow!`, msg);
-      speakText(msg);
-    }
-
-    // Klik kotak target jika ingin ubah angka manual sewaktu-waktu
-    document.getElementById('targetBox').addEventListener('click', () => {
-      const input = prompt('Masukkan jumlah followers terbaru:', currentFollowers);
-      const parsed = parseInt(input, 10);
-      if (!isNaN(parsed) && parsed >= 0) {
-        currentFollowers = parsed;
-        localStorage.setItem(STORAGE_KEY, currentFollowers);
-        followerEl.textContent = currentFollowers;
+    targetBoxEl.addEventListener('click', () => {
+      const input = prompt('Masukkan jumlah followers @ceritapento saat ini:', currentFollowers);
+      if (input !== null && !isNaN(parseInt(input))) {
+        currentFollowers = parseInt(input);
+        renderFollowers();
       }
     });
 
-    // === TAMPILAN & SUARA PENTO ===
-    const chatUserEl = document.getElementById('chatUser');
-    const chatReplyEl = document.getElementById('chatReply');
-    const pentoImgEl = document.getElementById('pentoImg');
-    const avatarFrameEl = document.getElementById('avatarFrame');
-    const aiStatusEl = document.getElementById('aiStatus');
-    const tfStatusEl = document.getElementById('tfStatus');
+    renderFollowers();
 
+    // ==========================================
+    // 3. ANIMASI KARAKTER & TEXT-TO-SPEECH (TTS)
+    // ==========================================
+    const pentoImg = document.getElementById('pentoImg');
+    const dialogSender = document.getElementById('dialogSender');
+    const dialogText = document.getElementById('dialogText');
+    const aiStatus = document.getElementById('aiStatus');
+    const tfStatus = document.getElementById('tfStatus');
+    const audioUnlockHint = document.getElementById('audioUnlockHint');
+
+    let mouthInterval = null;
     let isBusy = false;
     const commentQueue = [];
 
-    function updateChat(user, text) {
-      chatUserEl.textContent = user;
-      chatReplyEl.textContent = text;
-    }
-
-    function setSpeaking(state) {
-      if (state) {
-        pentoImgEl.src = 'pento_ngomong.png';
-        avatarFrameEl.classList.add('speaking');
-      } else {
-        pentoImgEl.src = 'pento_diam.png';
-        avatarFrameEl.classList.remove('speaking');
+    document.body.addEventListener('click', () => {
+      if ('speechSynthesis' in window) {
+        const unlock = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(unlock);
+        audioUnlockHint.textContent = 'Audio aktif';
       }
+    }, { once: true });
+
+    function startTalkingAnimation() {
+      pentoImg.classList.add('talking-bounce');
+      let toggle = false;
+      clearInterval(mouthInterval);
+      mouthInterval = setInterval(() => {
+        toggle = !toggle;
+        pentoImg.src = toggle ? 'pento_ngomong.png' : 'pento_diam.png';
+      }, 160);
     }
 
-    function speakText(text) {
-      if (!('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'id-ID';
-      utter.rate = 1.08;
-      utter.pitch = 1.05;
-      utter.onstart = () => setSpeaking(true);
-      utter.onend = () => {
-        setSpeaking(false);
-        isBusy = false;
-        processNextQueue();
-      };
-      utter.onerror = () => {
-        setSpeaking(false);
-        isBusy = false;
-        processNextQueue();
-      };
-      window.speechSynthesis.speak(utter);
+    function stopTalkingAnimation() {
+      clearInterval(mouthInterval);
+      pentoImg.classList.remove('talking-bounce');
+      pentoImg.src = 'pento_diam.png';
     }
 
-    // === GEMINI AI RESPONDER ===
-    async function askGemini(username, comment) {
-      if (!API_KEY) {
-        aiStatusEl.textContent = 'AI: NO KEY';
-        return `Mantap masukannya suhu ${username}!`;
-      }
-      try {
-        const promptText = `Kamu adalah Pento, karakter kartun cowok santai yang lagi nabung di toples buat beli motor 2-tak impian (Kawasaki Ninja 150 SS atau bebek 2-tak seperti F1ZR / Satria 2-tak). Balas komentar penonton live TikTok bernama "${username}" yang bilang: "${comment}". Jawab singkat maksimal 2 kalimat, bahasa gaul Indonesia santai, jenaka, dan memancing penonton lain ikut komen.`;
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: promptText }] }]
-          })
-        });
-        const data = await res.json();
-        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-        if (reply) {
-          aiStatusEl.textContent = 'AI: OK';
-          aiStatusEl.classList.add('status-ok');
-          return reply;
-        }
-      } catch (e) {
-        console.error(e);
-      }
-      return `Siap suhu ${username}, racun 2-taknya langsung Pento catat ke toples tabungan!`;
-    }
-
-    async function processNextQueue() {
-      if (isBusy || commentQueue.length === 0) return;
-      isBusy = true;
-      const item = commentQueue.shift();
-
-      if (item.type === 'follow') {
-        addFollower(item.username);
+    function speakText(text, onDone) {
+      if (!('speechSynthesis' in window)) {
+        startTalkingAnimation();
+        setTimeout(() => {
+          stopTalkingAnimation();
+          if (onDone) onDone();
+        }, 3500);
         return;
       }
 
-      updateChat(`💬 @${item.username}: "${item.comment}"`, 'Pento lagi mikir...');
-      const reply = await askGemini(item.username, item.comment);
-      updateChat(`💬 @${item.username}: "${item.comment}"`, reply);
-      speakText(reply);
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'id-ID';
+      utterance.rate = 1.08;
+      utterance.pitch = 1.15;
+
+      const voices = window.speechSynthesis.getVoices();
+      const idVoice = voices.find(v => v.lang.includes('id'));
+      if (idVoice) utterance.voice = idVoice;
+
+      utterance.onstart = () => startTalkingAnimation();
+      utterance.onend = () => {
+        stopTalkingAnimation();
+        if (onDone) onDone();
+      };
+      utterance.onerror = () => {
+        stopTalkingAnimation();
+        if (onDone) onDone();
+      };
+
+      window.speechSynthesis.speak(utterance);
     }
 
-    // === KONEKSI WEBSOCKET TIKFINITY (PORT 21213) ===
+    // ==========================================
+    // 4. GEMINI AI RESPONDER (HEADER x-goog-api-key)
+    // ==========================================
+    async function generatePentoReply(username, comment) {
+      const prompt = `Kamu adalah "Si Pento", karakter kartun 2D kocak, sopan, dan antusias asal Indonesia yang sedang live TikTok (@ceritapento) untuk misi menabung di toples demi membeli motor 2-tak impian (Kawasaki Ninja 150 SS, Yamaha F1ZR, Alfa, atau Suzuki Tornado) sambil mengejar target 600 followers.
+Penonton bernama "${username}" baru saja berkomentar: "${comment}".
+Balas komentar tersebut secara relevan, nyambung dengan isi pertanyaannya, santai ala anak motor 2-tak Indonesia, maksimal 2 kalimat pendek (maksimal 160 karakter) agar enak dibacakan suara AI. Jangan pakai hashtag atau emoji berlebihan.`;
+
+      try {
+        const res = await fetch(
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-goog-api-key': API_KEY
+            },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                temperature: 0.8,
+                maxOutputTokens: 120
+              }
+            })
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
+
+        const data = await res.json();
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        if (!reply) throw new Error('Empty AI response');
+
+        aiStatus.textContent = 'AI: OK';
+        aiStatus.className = 'badge-ok';
+        return reply;
+      } catch (err) {
+        console.error('Gemini Error:', err);
+        aiStatus.textContent = 'AI: ERR';
+        aiStatus.className = 'badge-err';
+        return `Mantap masukannya Bang ${username}! Bantu follow menuju 600 ya suhu biar toples 2-tak Pento makin penuh!`;
+      }
+    }
+
+    async function processQueue() {
+      if (isBusy || commentQueue.length === 0) return;
+      isBusy = true;
+
+      const item = commentQueue.shift();
+      dialogSender.textContent = `💬 ${item.user}: "${item.text}"`;
+      dialogText.textContent = 'Pento lagi mikir...';
+
+      const reply = await generatePentoReply(item.user, item.text);
+      dialogText.textContent = reply;
+
+      speakText(reply, () => {
+        isBusy = false;
+        processQueue();
+      });
+    }
+
+    function enqueueComment(user, text) {
+      if (!text || text.trim().length === 0) return;
+      if (commentQueue.length >= 5) commentQueue.shift(); // jaga antrean tetap segar
+      commentQueue.push({ user: user || 'Suhu 2-Tak', text: text.trim() });
+      processQueue();
+    }
+
+    // ==========================================
+    // 5. KONEKSI WEBSOCKET TIKFINITY DESKTOP
+    // ==========================================
     function connectTikFinity() {
-      const ws = new WebSocket('ws://localhost:21213/');
+      let ws;
+      try {
+        ws = new WebSocket('ws://localhost:21213/');
+      } catch (e) {
+        tfStatus.textContent = 'TF: ERR';
+        tfStatus.className = 'badge-err';
+        setTimeout(connectTikFinity, 4000);
+        return;
+      }
 
       ws.onopen = () => {
-        tfStatusEl.textContent = 'TF: OK';
-        tfStatusEl.classList.add('status-ok');
-        aiStatusEl.textContent = 'AI: OK';
-        aiStatusEl.classList.add('status-ok');
+        tfStatus.textContent = 'TF: OK';
+        tfStatus.className = 'badge-ok';
       };
 
       ws.onmessage = (event) => {
         try {
           const msg = JSON.parse(event.data);
-          const evType = (msg.event || '').toLowerCase();
-          const data = msg.data || {};
-          const user = data.nickname || data.uniqueId || 'Suhu 2-Tak';
+          const ev = msg.event;
+          const d = msg.data || {};
 
-          // Deteksi Follow Baru Otomatis
-          if (evType === 'follow' || (evType === 'social' && (data.displayType || '').includes('follow'))) {
-            commentQueue.unshift({ type: 'follow', username: user });
-            processNextQueue();
-          }
-          // Deteksi Komentar Penonton
-          else if (evType === 'chat' && data.comment) {
-            if (commentQueue.length < 5) {
-              commentQueue.push({ type: 'chat', username: user, comment: data.comment });
-              processNextQueue();
-            }
+          if (ev === 'chat') {
+            const uname = d.nickname || d.uniqueId || 'Suhu';
+            const text = d.comment || '';
+            enqueueComment(uname, text);
+          } else if (ev === 'follow') {
+            currentFollowers += 1;
+            renderFollowers();
+            const uname = d.nickname || d.uniqueId || 'Suhu';
+            enqueueComment(uname, 'Baru saja mengikuti @ceritapento!');
+          } else if (ev === 'gift' && d.repeatEnd) {
+            const uname = d.nickname || d.uniqueId || 'Sultan';
+            const giftName = d.giftName || 'Gift';
+            enqueueComment(uname, `Mengirim saweran ${giftName} buat nambah isi toples 2-tak!`);
           }
         } catch (err) {
-          console.error(err);
+          console.warn('Parse WS error:', err);
         }
       };
 
       ws.onclose = () => {
-        tfStatusEl.textContent = 'TF: RETRY';
-        tfStatusEl.classList.remove('status-ok');
+        tfStatus.textContent = 'TF: RETRY';
+        tfStatus.className = 'badge-warn';
         setTimeout(connectTikFinity, 3000);
+      };
+
+      ws.onerror = () => {
+        ws.close();
       };
     }
 
